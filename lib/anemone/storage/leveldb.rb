@@ -13,7 +13,7 @@ module Anemone
     class LevelDB
       extend Forwardable
 
-      def_delegators :@db, :close, :size, :keys, :has_key?
+      def_delegators :@db, :close, :keys
 
       def initialize(file)
         @db = ::LevelDB::DB.new(file)
@@ -29,6 +29,14 @@ module Anemone
         @db[key] = [Marshal.dump(value)].pack("m")
       end
 
+      def size
+        @db.keys.count
+      end
+
+      def has_key?(url)
+        @db.exists? url
+      end
+
       def delete(key)
         value = self[key]
         @db.delete(key)
@@ -36,12 +44,8 @@ module Anemone
       end
 
       def each
-        @db.keys.each do |k, v|
-          if v
-            yield(k, load_value(v))
-          else
-            yield(k, v)
-          end
+        @db.keys.each do |k|
+          yield(k, self[k])
         end
       end
 
