@@ -47,6 +47,25 @@ module Anemone
       end
     end
 
+    describe ".LevelDB" do
+      context "when the file is specified" do
+        it "returns a LevelDB adapter using that file" do
+          test_file = 'test'
+          store = Anemone::Storage.LevelDB(test_file)
+          store.should be_an_instance_of(Anemone::Storage::LevelDB)
+          store.close
+        end
+      end
+
+      context "when no file is specified" do
+        it "returns a LevelDB adapter using the default filename" do
+          store = Anemone::Storage.LevelDB
+          store.should be_an_instance_of(Anemone::Storage::LevelDB)
+          store.close
+        end
+      end
+    end
+
     describe ".SQLite3" do
       it "returns a SQLite3 adapter" do
         test_file = 'test.db'
@@ -201,6 +220,24 @@ module Anemone
 
         it "should raise an error if supplied with a file extension other than .kch" do
           lambda { Anemone::Storage.KyotoCabinet('test.tmp') }.should raise_error(RuntimeError)
+        end
+      end
+
+      describe LevelDB do
+        it_should_behave_like "storage engine"
+
+        before(:each) do
+          @test_file = 'test'
+          File.delete @test_file rescue nil
+          @store =  Anemone::Storage.LevelDB(@test_file)
+        end
+
+        after(:each) do
+          @store.close
+        end
+
+        after(:all) do
+          File.delete @test_file rescue nil
         end
       end
 
