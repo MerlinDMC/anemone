@@ -23,11 +23,6 @@ module Anemone
       self::KyotoCabinet.new(file)
     end
 
-    def self.LevelDB(file = 'anemone')
-      require 'anemone/storage/leveldb'
-      self::LevelDB.new(file)
-    end
-
     def self.MongoDB(mongo_db = nil, collection_name = 'pages')
       require 'anemone/storage/mongodb'
       mongo_db ||= Mongo::Connection.new.db('anemone')
